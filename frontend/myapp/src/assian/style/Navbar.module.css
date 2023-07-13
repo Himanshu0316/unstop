@@ -34,9 +34,15 @@
     color: dodgerblue;
     border-radius: 5px;
 }
-
+.Box{
+    width: 98%;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 .Home {
-    width: 100%;
+    width: 45%;
     margin: auto;
     display: flex;
     flex-direction: column;
@@ -65,7 +71,7 @@
 }
 
 .Grids {
-    margin-top: 20px;
+    margin-top: 10px;
     display: grid;
     grid-template-columns: repeat(7,1fr);
     grid-gap: 10px;

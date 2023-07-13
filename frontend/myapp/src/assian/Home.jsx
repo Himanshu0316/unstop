@@ -21,21 +21,21 @@ const Home = () => {
                 }
                 console.log(res)
             });
-            // await axios.get("http://localhost:5000/seat")
-            // .then((res)=>{
-            //    function compare(a,b){
-            //        return a.seatNumber-b.seatNumber
-            //    }
+            await axios.get("http://localhost:5000/seat")
+            .then((res)=>{
+               function compare(a,b){
+                   return a.seatNumber-b.seatNumber
+               }
                
-            //    let y=res
-            //    console.log("resy",y)
-            //     // y.sort(compare)
-            //    setSeats(y);
-            //    setNumSeats('');
-            //    setMsg("")
-            // }).catch((e)=>{
-            //     console.log("error",e)
-            // });
+               let y=res
+               console.log("resy",y)
+                // y.sort(compare)
+               setSeats(y);
+               setNumSeats('');
+               setMsg("")
+            }).catch((e)=>{
+                console.log("error",e)
+            });
              
            }catch(error){
              console.error(error.response.data.error);
@@ -73,19 +73,9 @@ const Home = () => {
     }, []);
         console.log(seats)
     return (
+        <div className={styles.Box}>
         <div className={styles.Home}>
             <h1>Booking</h1>
-            <div style={{display:"flex",gap:"10px",marginTop:"20px"}}>
-            <h4> Booked Seats No:-</h4>
-            {
-          book.map((el)=>(
-            
-           <p>{el}</p>
-             
-            ))}
-           </div>
-
-           <div></div>
             <input className={styles.Input}
                 type="number"
                 placeholder='Fill Seats'
@@ -93,7 +83,21 @@ const Home = () => {
                 value={numSeats}
                 onChange={(e) => setNumSeats(e.target.value)} />
             <button className={styles.Button} onClick={handleClick}>Book Now</button>
-            <div className={styles.Grids}>
+            
+        </div>
+        <div className={styles.Home}>
+        <div style={{display:"flex",gap:"10px",alignItems:"center"}}>
+            <h4> Booked Seats No:-</h4>
+            <p>f</p>
+            <p>g</p>
+            {
+          book.map((el)=>(
+            
+           <p>{el}</p>
+             
+            ))}
+           </div>
+           <div className={styles.Grids}>
                 {seats.map((seat) => (
 
                     <div key={seat._id} className={styles.Griddiv} style={{ backgroundColor: seat.isBooked ? "red" : "yellow" }}>
@@ -103,6 +107,7 @@ const Home = () => {
 
                 ))}
             </div>
+        </div>
         </div>
     )
 }
