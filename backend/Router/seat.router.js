@@ -15,82 +15,91 @@ seatRouter.get('/', async (req, res) => {
 seatRouter.post("/seatbook",async(req,res)=>{
 
   try {
-    const numSeats = req.body.numSeats;
-
-    if (numSeats > 7) {
+    const requiredSeats = req.body.numSeats;
+     
+    if (requiredSeats > 7) {
       return res.status(400).json({ error: 'Maximum 7 seats can be booked at a time' });
     }
 
-    if (numSeats <= 0) {
+    if (requiredSeats <= 0) {
       return res.status(400).json({ error: 'Number of seats must be greater than 0' });
     }
+    
+    const seats = await seatModel.find();
+          console.log(seats);
+    let reserved = [];
 
+    // Code below check that number of seats require to book are available in a single row or not, if available then it will store the seat number in the reserved array and update the status of the seat.
+     console.log(seats[0].seatNumber)
+    let i = 0;
+    while (i<seats.length && i<=71){
+        let empty = 0;
+        for (let j=i;j<i+7;j++){                //  Counting the number of seats available in a single row. 
+            if (seats[j].isBooked===false){
+                empty++;
+            }
+        }
 
+        if (empty>=requiredSeats){
+            empty = requiredSeats;
+            for (let j=i;j<i+7;j++){            // Booking the required number of seats in a single row. 
+                if (seats[j].isBooked===false && empty>0){
+                    reserved.push(seats[j].seatNumber);
+                    await seatModel.findByIdAndUpdate({_id : seats[j]._id}, {isBooked : true});
+                    empty--;
+                }
+            }
 
-    // Find available seats in one row
-    const availableSeatsInOneRow = await seatModel.aggregate([
-      { $match: { isBooked: false } },
-      { $group: { _id: "$row", count: { $sum: 1 } } },
-      { $match: { count: { $gte: numSeats } } },
-      { $sort: { _id: 1 } },
-      { $lookup: { from: "seats", localField: "_id", foreignField: "row", as: "seats" } },
-      { $unwind: "$seats" },
-      { $match: { "seats.isBooked": false } },
-      { $sort: { "seats.seatNumber": 1 } },
-      { $limit: numSeats }
-    ]);
+            break;
+        } else {
+            i+=7;
+        }
+    };
 
-    if (availableSeatsInOneRow.length >= numSeats) {
-      // Reserve seats in one row
-      let temp=[]
-      const seatIds = availableSeatsInOneRow.map(seat => seat.seats._id);
-      await seatModel.updateMany({ _id: { $in: seatIds } }, { $set: { isBooked: true } });
-      availableSeatsInOneRow.map((seat)=>{
-        temp.push(seat.seats.seatNumber)
-      });
-      // return res.json({ message: 'Seats reserved successfully' });
-      return res.json({ message: temp});
+    if (reserved.length>0){
+        res.status(200).send(reserved);     // Response to the request with seat numbers which has been booked.
+    } else {
+        // Code below check that number of seats require to book are available with the least distance between them or not, if available then it will store the seat number in the reserved array and update the status of the seat.
+
+        const isEmpty = await seatModel.find({"isBooked" : false}).sort({"seatNumber" : 1});
+
+        if (isEmpty.length<requiredSeats){              // Checking if the require seats are available
+            res.status(400).send({ "message" : "Sorry, we don't have enough seats to book." }) ;    // Error response due to unavailability of the require seats.
+        } else if (isEmpty.length===requiredSeats){    
+            for (let j=0;j<isEmpty.length;j++){
+                reserved.push(isEmpty[j].seatNumber);
+                await seatModel.findByIdAndUpdate({_id : isEmpty[j]._id}, {isBooked : true});
+            };
+
+            res.status(200).send(reserved);         // Response to the request with seat numbers which has been booked.
+        }
+
+        let difference = [];
+        let a = 0;
+        while (a<=isEmpty.length-requiredSeats){            // Finding the difference between first and last seat of the require seats and storing them in difference array.
+            let first = isEmpty[a].seatNumber;
+            let last = isEmpty[a+requiredSeats-1].seatNumber;
+
+            difference.push(last-first);
+            a+=requiredSeats;
+        };
+
+        let least = Math.min(...difference);            // Finding the least difference from the difference array.
+        let index = difference.indexOf(least) || 1;     // Finding the index value of the least difference.
+
+        for (let j=requiredSeats*index;j<requiredSeats*index+requiredSeats;j++){        // Booking the seats with the least difference between them by updating the 'isBooked' status.
+            console.log(isEmpty[j].seatNumber);
+            reserved.push(isEmpty[j].seatNumber);
+            await seatModel.findByIdAndUpdate({_id : isEmpty[j]._id}, {isBooked : true});
+        }
+
+        res.status(200).send(reserved);     // Response to the request with seat numbers which has been booked.
     }
-
-    // Reserve seats in nearby rows
-    const lastReservedRow = await seatModel.findOne({ isBooked: true }).sort({ row: -1 });
-    const nextRow = lastReservedRow ? lastReservedRow.row + 1 : 1;
-
-    const availableSeatsNearby = await seatModel.aggregate([
-      { $match: { isBooked: false, row: nextRow } },
-      { $sort: { seatNumber: 1 } },
-      { $limit: numSeats }
-    ]);
-
-    if (availableSeatsNearby.length >= numSeats) {
-      // Reserve seats in nearby rows
-      let temp=[]
-      const seatIds = availableSeatsNearby.map(seat => seat._id);
-      await seatModel.updateMany({ _id: { $in: seatIds } }, { $set: { isBooked: true } });
-      awail
-      availableSeatsInOneRow.map((seat)=>{
-        temp.push(seat.seats.seatNumber)
-      });
-      // return res.json({ message: 'Seats reserved successfully' });
-      return res.json({ message: temp});
-    }
-
-    if (availableSeatsInOneRow.length >= numSeats) {
-      // Reserve seats in one row
-      let temp=[]
-      const seatIds = availableSeatsInOneRow.map(seat => seat.seats._id);
-      await seatModel.updateMany({ _id: { $in: seatIds } }, { $set: { isBooked: true } });
-      availableSeatsInOneRow.map((seat)=>{
-        temp.push(seat.seats.seatNumber)
-      });
-      // return res.json({ message: 'Seats reserved successfully' });
-      return res.json({ message: temp});
-      // return res.json({ message: 'Seats reserved successfully' });
-    } 
+ 
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 })
-
+//return res.json({ message: temp});
 module.exports = seatRouter;

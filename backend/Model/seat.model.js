@@ -4,9 +4,6 @@ const seatSchema = Schema({
     seatNumber: Number,
     row: Number,
     isBooked: Boolean,
-    },
-    {
-        versionKey:false
     });
 const seatModel = model("seats",seatSchema)
 module.exports = seatModel;

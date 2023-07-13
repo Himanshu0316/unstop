@@ -7,33 +7,40 @@ const Home = () => {
     const [book, setBook] = useState([])
     const [msg, setMsg] = useState("")
     const handleClick = async () => {
-        console.log("hii")
+        const payload = {
+            "numSeats":Number(numSeats)
+        }
+        console.log(payload)
         try {
-            await axios.post(`/seat/seatbook`, {
-                numSeats: parseInt(numSeats)
-            }).then((res) => {
-                console.log(res.data.message);
+            
+            await axios.post("http://localhost:5000/seat/seatbook", payload).then((res) => {
+                console.log("hii")
+                console.log("res1",res.data.message);
                 if (res.data.message) {
                     setBook(res.data.message)
                 }
                 console.log(res)
             });
-            await axios.get(`/seat`)
-            .then((res)=>{
-               function compare(a,b){
-                   return a.seatNumber-b.seatNumber
-               }
-       
-               let y=res.data.seats
-                y.sort(compare)
-               setSeats(y);
-               setNumSeats('');
-               setMsg("")
-            })
+            // await axios.get("http://localhost:5000/seat")
+            // .then((res)=>{
+            //    function compare(a,b){
+            //        return a.seatNumber-b.seatNumber
+            //    }
+               
+            //    let y=res
+            //    console.log("resy",y)
+            //     // y.sort(compare)
+            //    setSeats(y);
+            //    setNumSeats('');
+            //    setMsg("")
+            // }).catch((e)=>{
+            //     console.log("error",e)
+            // });
              
            }catch(error){
              console.error(error.response.data.error);
              setMsg(error.response.data.error)
+             console.log("reserr",error.response.data.error)
              alert(msg)
              setBook([])
            }
@@ -43,7 +50,7 @@ const Home = () => {
         const fetchSeats = async () => {
         
             try {
-                await axios.get(`/seat`)
+                await axios.get("http://localhost:5000/seat")
                 .then((res)=>{
                     console.log(res)
                     function compare(a,b){
@@ -53,7 +60,7 @@ const Home = () => {
                     let y=res.data.seats
                    y.sort(compare)
                     setSeats(y);
-                    console.log("g",seats)
+                    console.log("g",y)
                 })
                
               } catch (error) {
