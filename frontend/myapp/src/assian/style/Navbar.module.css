@@ -1,4 +1,4 @@
-.Navbar{
+.Navbar {
     margin: auto;
     width: 100%;
     height: 70px;
@@ -7,19 +7,22 @@
     align-items: center;
     border-bottom: 1px solid whitesmoke;
 }
-.Logo{
+
+.Logo {
     margin-left: 10px;
     text-decoration: none;
     font-weight: bold;
     font-size: 18px;
     color: black;
 }
-.Logo:hover{
+
+.Logo:hover {
     font-size: 19px;
     color: dodgerblue;
     border-bottom: 2px solid dodgerblue;
 }
-.Input{
+
+.Input {
     width: 25%;
     min-width: 240px;
     text-align: center;
@@ -31,7 +34,8 @@
     color: dodgerblue;
     border-radius: 5px;
 }
-.Home{
+
+.Home {
     width: 100%;
     margin: auto;
     display: flex;
@@ -39,12 +43,13 @@
     justify-content: center;
     align-items: center;
 }
-.Button{
+
+.Button {
     width: 25%;
     min-width: 240px;
     height: 35px;
     background-color: dodgerblue;
-   border: 0;
+    border: 0;
     border-radius: 5px;
     color: white;
     margin-top: 20px;
@@ -52,8 +57,21 @@
     font-size: 18px;
 
 }
-.Button:hover{
+
+.Button:hover {
     opacity: 0.5;
     border: 2px solid white;
     outline: 2px solid dodgerblue;
+}
+
+.Grids {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    grid-gap: 10px;
+    align-items: center;
+}
+.Griddiv{
+    width: 40px;
+    height: 40px;
 }
