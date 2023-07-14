@@ -7,7 +7,10 @@ const PORT = process.env.PORT || 5000;
 const mongodb_url = process.env.MONGODB_URL || "mongodb://localhost:27017/booking";
 const app = express()
 
-app.use(cors())
+const corsOptions ={
+    credentials:true,
+}
+app.use(cors(corsOptions));
 app.use(express.json())
 
 app.get("/",(req,res)=>{
