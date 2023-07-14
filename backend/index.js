@@ -13,11 +13,10 @@ const corsOptions ={
 app.use(cors(corsOptions));
 app.use(express.json())
 
+app.use("/seat",seatRouter)
 app.get("/",(req,res)=>{
     res.send("Home Page")
 })
-
-app.use("/seat",seatRouter)
 mongoose.connect(mongodb_url).then(() => {
     app.listen(PORT, () => {
       console.log("server is started on port " + PORT);
