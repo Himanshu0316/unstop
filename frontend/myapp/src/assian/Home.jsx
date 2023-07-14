@@ -13,7 +13,7 @@ const Home = () => {
         console.log(payload)
         try {
             
-            await axios.post("http://localhost:5000/seat/seatbook", payload).then((res) => {
+            await axios.post("/seat/seatbook", payload).then((res) => {
                 console.log("hii")
                 console.log("res1",res.data.message);
                 if (res.data.message) {
@@ -21,15 +21,15 @@ const Home = () => {
                 }
                 console.log(res)
             });
-            await axios.get("http://localhost:5000/seat")
+            await axios.get("/seat")
             .then((res)=>{
                function compare(a,b){
                    return a.seatNumber-b.seatNumber
                }
                
-               let y=res
+               let y=res.data.seats
                console.log("resy",y)
-                // y.sort(compare)
+                 y.sort(compare)
                setSeats(y);
                setNumSeats('');
                setMsg("")
@@ -45,14 +45,34 @@ const Home = () => {
              setBook([])
            }
     };
+    const resetBooking = async () => {
+        try {
+          const response = await axios.put('/seat/reset');
+          console.log(response.data.message);
+          // Refresh the seat data after resetting
+          await axios.get('seat')
+          .then((res)=>{
+            function compare(a,b){
+                return a.seatNumber-b.seatNumber
+            }
+    
+            let y=res.data.seats
+             y.sort(compare)
+            setSeats(y)
+            setBook([])
+          })
+        } catch (error) {
+          console.error(error.response.data.error);
+        }
+      };
     
     useEffect(() => {
         const fetchSeats = async () => {
         
             try {
-                await axios.get("http://localhost:5000/seat")
+                await axios.get("/seat")
                 .then((res)=>{
-                    console.log(res)
+                    console.log("fff",res)
                     function compare(a,b){
                         return a.seatNumber-b.seatNumber
                     }
@@ -65,7 +85,6 @@ const Home = () => {
                
               } catch (error) {
                 console.error(error);
-                console.log("e",seats)
                 
               }
         };
@@ -83,13 +102,11 @@ const Home = () => {
                 value={numSeats}
                 onChange={(e) => setNumSeats(e.target.value)} />
             <button className={styles.Button} onClick={handleClick}>Book Now</button>
-            
+            <button className={styles.Button} onClick={resetBooking}>Reset Tickets</button>
         </div>
         <div className={styles.Home}>
         <div style={{display:"flex",gap:"10px",alignItems:"center"}}>
             <h4> Booked Seats No:-</h4>
-            <p>f</p>
-            <p>g</p>
             {
           book.map((el)=>(
             
